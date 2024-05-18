@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Apple!! ASCII Animation</title>
+    <style>
+        body {
+            background-color: rgb(60, 60, 60);
+            color: white;
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        textarea {
+            background-color: black;
+            color: white;
+            width: 596.3px;
+            height: 443.3px;
+            font-size: 13.5px;
+            border: none;
+            resize: none;
+            outline: none;
+            overflow: hidden;
+            white-space: pre;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            border-radius: 10px;
+            padding: 5px;
+        }
+        #render{
+            display:none;
+        }
+    </style>
+</head>
+
+<body>
+    <video id="video" src="bad_apple.mp4" type="video/mp4" style="display:none"></video>
+    <textarea id="screen" readonly>Click to start...</textarea><br /><br />
+    <div>
+        <button id="copy">Copy JS</button>
+    </div>
+    <canvas id="render"></canvas>
+    <script>
+        const video = document.getElementById('video');
+        const screen = document.getElementById('screen');
+        const copy = document.getElementById('copy');
+        const canvas = document.getElementById('render');
+        const ctx = canvas.getContext('2d');
+        let mediaRecorder;
+        let recordedChunks = [];
+        let videoWidth, videoHeight;
+        function play(){
+            video.play();
+            function exec() {
+                if (!video.paused && !video.ended) {
+                    processFrame();
+                }
+                else if (video.ended) {
+                    screen.value = "\"Bad Apple!!\""
+                }
+                window.requestAnimationFrame(exec);
+            }
+            requestAnimationFrame(exec);
+        }
+        document.addEventListener('click', () => play(), { once: true });
+
+        copy.addEventListener('click', () => {
+            if (!video.paused && !video.ended) navigator.clipboard.writeText(screen.value)
+        });
+
+        video.addEventListener('loadedmetadata', () => {
+            videoWidth = Math.floor(video.videoWidth / 6);
+            videoHeight = Math.floor((video.videoHeight / 6) - 3);
+            screen.style.width = videoWidth;
+            screen.style.height = videoHeight * 2;
+            canvas.width = videoWidth;
+            canvas.height = videoHeight;
+            console.log('Video metadata loaded:', videoWidth, videoHeight);
+        });
+        let asciiArt = '';
+        let jsSnippets = [
+            'const [r]=()=>{return "[r]"};console.log([r]());',
+            'let [r]=()=>{return "[r]"};console.log([r]());',
+            'const [r]=()=>{return "[r]"};[r]();',
+            'const [r]=()=>{return};[r]();',
+            'const [r]=()=>{return};',
+            'const [r]={};',
+            'let [r]=()=>{return "[r]";};[r]();',
+            'let [r]=()=>{return;};[r]();',
+            'let [r]={};',
+            'let [r]=()=>{return;};',
+            'const [r]=document.createElement("canvas");',
+            'const [r]=document.createElement("video");',
+            'const [r]=document.createElement("body");',
+            'const [r]=document.createElement("h1");',
+            'let [r]=document.createElement("canvas");',
+            'let [r]=document.createElement("video");',
+            'let [r]=document.createElement("body");',
+            'let [r]=document.createElement("h1");',
+            'console.log("[r]");',
+            'alert("[r]");',
+            'const [r]="";',
+            'document;',
+            'console;',
+            'window;'
+        ];
+
+        function processFrame() {
+            if (Math.random() > 0) jsSnippets = jsSnippets.sort((a, b) => b.length - a.length);
+            else jsSnippets = jsSnippets.sort((a, b) => a.length - b.length);
+            ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+            const frameData = ctx.getImageData(0, 0, videoWidth, videoHeight);
+            const asciiArt = convertToASCII(frameData);
+            screen.value = asciiArt;
+        }
+
+
+        function replaceSpacesWithJSDoc(spaces) {
+            if (spaces.length <= 4) return spaces;
+            return '/*' + ' '.repeat(spaces.length - 4) + '*/';
+        }
+
+        function n() {
+            const chars = "qwertyuiopasfgghjklzxcvbnmQWERTYUIOPASFGHJKLZXCVBNM_";
+            let name='';
+            for (let i = 0; i < 3; i++)
+                name += chars[Math.floor(Math.random() * chars.length)];
+            
+            //name = chars[Math.floor(Math.random() * chars.length)];
+            //name += chars[Math.floor(Math.random() * chars.length)];
+            if (asciiArt.includes(name)) asciiArt.replace(name, n);
+            return name;
+        }
+        function convertToJS(asciiLine) {
+            let st = asciiLine;
+
+            jsSnippets.forEach(snippet => {
+                const snippetLength = snippet.length;
+                const hashSequence = '#'.repeat(snippetLength);
+                const regex = new RegExp(hashSequence, 'g');
+                st = st.replace(regex, snippet);
+            });
+            st = st.replace(/\[r\]/g, n);
+            st = st.replace(/#/g, ';');
+            st = st.replace(/\s+/g, replaceSpacesWithJSDoc);
+
+            return st;
+        }
+
+        function convertToASCII(imageData) {
+            asciiArt = '';
+            const { data, width, height } = imageData;
+            let asciiLine = '';
+
+            const asciiChars = [' ', '#'];
+            for (let y = 0; y < height; y += 2) {
+                for (let x = 0; x < width; x++) {
+                    const offset = (y * width + x) * 4;
+                    const rgb = [data[offset], data[offset + 1], data[offset + 2]];
+                    const brightness = (rgb[0] + rgb[1] + rgb[2]) / 3;
+                    const charIndex = Math.floor((brightness / 255) * (asciiChars.length - 1));
+                    asciiLine += asciiChars[charIndex];
+                }
+                asciiArt += convertToJS(asciiLine) + '\n'; // Convert the ASCII line to JavaScript code
+                asciiLine = '';
+            }
+            return asciiArt;
+        }
+    </script>
+</body>
+
+</html>
