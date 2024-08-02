@@ -118,11 +118,9 @@
             'console.log("[r]");',
             'alert("[r]");',
             'navigator.clipboard;',
-            'window.URL;',
             'navigator;',
             'document;',
-            'console;',
-            'window;'
+            'console;'
         ];
 
         function processFrame() {
@@ -206,7 +204,7 @@
                     const charIndex = Math.floor((brightness / 255) * (asciiChars.length - 1));
                     asciiLine += asciiChars[charIndex];
                 }
-                asciiArt += convertToJS(asciiLine) + '\n'; // Convert the ASCII line to JavaScript code
+                asciiArt += convertToJS(asciiLine) + '\n';
                 asciiLine = '';
             }
             return asciiArt;
