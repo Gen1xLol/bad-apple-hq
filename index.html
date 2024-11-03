@@ -33,18 +33,23 @@
             border-radius: 10px;
             padding: 5px;
             user-select: none;
+            margin-top: 10px;
         }
 
         #render {
             display: none;
+        }
+
+        #ctrl {
+            margin-top: -25px;
         }
     </style>
 </head>
 
 <body>
     <video id="video" src="bad_apple.mp4" type="video/mp4" style="display:none"></video>
-    <textarea id="screen" readonly>Click to start...</textarea><br /><br />
-    <div>
+    <textarea id="screen" readonly></textarea><br /><br />
+    <div id="ctrl">
         <button id="copy">Copy JS</button>
         <button id="player">Play</button>
     </div>
@@ -55,6 +60,42 @@
         const copy = document.getElementById('copy');
         const canvas = document.getElementById('render');
         const ctx = canvas.getContext('2d');
+        screen.style="height: 525px; width: 691px;";
+        screen.value=`Made by WojtekGame, 2024
+                                     =@#(=[%(                                      
+                                    @>      ~@                                     
+                                    #@@-     *@                                    
+                                     :@@@    *@                                    
+                              *@@@@[     @   @<%@^                                 
+                        ^@@%#{           {% @~   *%@%.                             
+                    .%@%                              @@@{                         
+                  :@]                                     *@@#:                    
+                 %}                                           (@#                  
+                }[                                               {)                
+               [#                                                 )#               
+               @      +@[        =         \\  /\\  /                    %:              
+              ~{     <{ *@.     }@=         \\/\  \\/                      @              
+              =[     @   [*     @@@.(#   }     %     =              *#             
+              =[     @    %:   @@}-@@%}(@{  +#%@@:   %*              #             
+              =[     @     [} <@@         <@%@@%@    ]@-             }~            
+              }(     @    __ @@@>               @     #@*             @            
+             <#      @  @[=]%^):         -@#-   @     .@@             @            
+             ))      @ +[    #)        {}   ~@  %~     %@@:           %:           
+             ))      @        (       @=      @  @      @@@ (@  {)    )]           
+              @      @                [:      *  @.     +@@[ {+  @    .{           
+              @      @        @((((]@^           (]     ~@@@  @   @   :{           
+              =[ %]  %@       %     @^           *#      @@@@<%@>(@@. {^           
+               @}  @<+@%:     #%__(@#            ~#      @*-{{                     
+                    ^#   %@#+                  [%@%      [^                        
+                             +@%{]]]]]]#%%%%@@@+  ^{ %@[ [^                        
+                             <@=  =@@@@}    +@@=   @%  =@@^                        
+                            <%       []     #@@@<=       }^                        
+                            @       <@@{)   @@@@@@@@@@#^-                          
+                           }~    ^%       >@@@@@@@@@@@@@@@@@@}^                    
+                           {~   })                 =+]@@@@@@%  :(@-                
+                           @    @~                     ^          (@               
+                           @    {>                   {}            <#              
+                           @     @)                  @              @              `
         let mediaRecorder;
         let recordedChunks = [];
         let videoWidth, videoHeight;
@@ -101,26 +142,28 @@
             screen.style.height = videoHeight * 2;
             canvas.width = videoWidth;
             canvas.height = videoHeight;
-            console.log('Video metadata loaded:', videoWidth, videoHeight);
         });
         let asciiArt = '';
         let jsSnippets = [
-            'const [r]=()=>{return"[a]"};console.log([a]());',
-            'let [r]=()=>{return"[a]"};console.log([a]());',
-            'const [r]=()=>{return"[a]"};',
-            'const [r]=()=>{return};',
-            'const [r]={};',
-            'const [r]="";',
-            'let [r]=()=>{return"[a]"};',
-            'let [r]=()=>{return};',
-            'let [r]={};',
-            'let [r]="";',
-            'console.log("[r]");',
-            'alert("[r]");',
-            'navigator.clipboard;',
-            'navigator;',
-            'document;',
-            'console;'
+            'const [r]=()=>{return"[a]"};console.log([a]())_',
+            'let [r]=()=>{return"[a]"};console.log([a]())_',
+            'const [r]=()=>{return"[a]"}_',
+            'const [r]=()=>{return}_',
+            'const [r]={}_',
+            'const [r]=""_',
+            'let [r]=()=>{return"[a]"}_',
+            'let [r]=()=>{return}_',
+            'let [r]={}_',
+            'let [r]=""_',
+            'console.log("[r]")_',
+            'alert("[r]")_',
+            'navigator.clipboard_',
+            'document.body_',
+            'document.body.style_',
+            'document.body_',
+            'navigator_',
+            'document_',
+            'console_'
         ];
 
         function processFrame() {
@@ -131,8 +174,8 @@
             const asciiArt = convertToASCII(frameData);
             screen.value = asciiArt;
         }
-        
-        
+
+
         function replaceSpacesWithJSDoc(spaces) {
             if (spaces.length <= 4) return spaces;
             return '/*' + ' '.repeat(spaces.length - 4) + '*/';
@@ -153,11 +196,11 @@
         }
 
         function add() {
-            const l = ["canvas", "video", "body", "h1", "h2", "textarea"];
+            const l = ["canvas", "video", "body", "h1", "h2", "textarea", "h3", "p", "svg", "i", "b"];
             for (let i = 0; i < l.length; i++) {
-                jsSnippets.push('const [r]=document.createElement("'+l[i]+'");');
-                jsSnippets.push('let [r]=document.createElement("'+l[i]+'");');
-                
+                jsSnippets.push('const [r]=document.createElement("' + l[i] + '")_');
+                jsSnippets.push('let [r]=document.createElement("' + l[i] + '")_');
+
             }
         }
         add();
@@ -172,7 +215,7 @@
                 st = st.replace(/\[a\]/g, usedNames[usedNames.length - 1]);
                 st = st.replace(/\[r\]/g + "()", usedNames[1 - usedNames.length] + "()");
             });
-            
+
             st = st.replace(/#/g, ';');
             jsSnippets.forEach(snippet => {
                 const snippetLength = snippet.length;
@@ -183,6 +226,7 @@
                 st = st.replace(/\[a\]/g, usedNames[usedNames.length - 1]);
                 st = st.replace(/\[r\]/g + "()", usedNames[1 - usedNames.length] + "()");
             });
+            st = st.replaceAll("_", ";");
             st = st.replace("; ", ";");
             st = st.replace("*/ ", "*/");
             st = st.replace(/\s+/g, replaceSpacesWithJSDoc);
