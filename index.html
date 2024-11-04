@@ -48,13 +48,12 @@
         #ctrl {
             position: absolute;
             display: flex;
-            vertical-align: middle;
             align-items: center;
             display: none;
             background-color: #000;
             padding: 5px;
             text-align: center;
-            padding-top:10px;
+            padding-top: 10px;
         }
 
         button {
@@ -65,12 +64,13 @@
             border-color: #fff;
             cursor: pointer;
             padding: 3px;
-            
         }
 
-        button:hover,::selection {
+        button:hover,
+        ::selection {
             background: rgb(88, 143, 6);
         }
+
         img {
             user-select: none;
             border-radius: 10px;
@@ -85,16 +85,17 @@
 
 <body>
     <a href="https://wojtekgame.is-a.dev"><img src="img.png" /></a>
-    <video id="video" src="bad_apple.mp4" type="video/mp4" style="display:none"></video>
+    <video id="video" type="video/mp4" style="display:none"></video>
     <div id="ctrl">
         <button id="copy">Copy JS</button>
         <button id="player">Play</button>
-        <br/>
-        <input type="checkbox" id="jsdoc">
-        JSDoc comments
+        <br />
+        <input type="checkbox" id="jsdoc"> JSDoc comments
     </div>
     <textarea id="screen" readonly></textarea><br /><br />
     <canvas id="render"></canvas>
+    <input type="file" id="videoUpload" accept="video/*" />
+
     <script>
         let gEBI = (a) => { return document.getElementById(a) }
         const video = gEBI('video');
@@ -103,14 +104,27 @@
         const canvas = gEBI('render');
         const ctrl = gEBI('ctrl');
         const ctx = canvas.getContext('2d');
-        screen.value = "\n\n\nMade by WojtekGame, 2024\n\nI made this project for fun :D\n\nalso, the JS code from the frames DOES work on an HTML page. (tested)\n\nyou will see a bit of flashing code so,\n\ni'm sorry for those who have photosensitive epilepsy";
+        const videoUpload = gEBI('videoUpload');
+
+        screen.value = "\n\n\nMade by Gen1x, 2024\n\nThis project was created for fun :D\n\nThe JS code from the frames works on an HTML page. (tested)\n\nNote: There may be some flashing code, so apologies to those with photosensitive epilepsy.";
         screen.style = "height: 525px; width: 691px;";
+
+        videoUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                video.src = url;
+                video.load();
+            }
+        });
+
         let mediaRecorder;
         let recordedChunks = [];
         let videoWidth, videoHeight;
         let usedNames = [];
         let nl = 0;
-        let cursorleft = 0
+        let cursorleft = 0;
+
         function play() {
             video.play();
             player.innerText = "Pause";
@@ -121,21 +135,22 @@
                     screen.style.height = (screen.scrollHeight - 25) + "px";
                     screen.style.width = "1px";
                     screen.style.width = (screen.scrollWidth) + "px";
-                }
-                else if (video.ended) screen.value = ""
-                ctrl.style.display = (cursorleft == 0) ? "block" : "none"
+                } else if (video.ended) screen.value = "";
+                ctrl.style.display = (cursorleft == 0) ? "block" : "none";
                 window.requestAnimationFrame(exec);
             }
             requestAnimationFrame(exec);
         }
-        ctrl.addEventListener("mousemove", () => { cursorleft = 0 })
-        screen.addEventListener("mouseenter", () => { cursorleft = 0 })
-        screen.addEventListener("mouseleave", () => { cursorleft = 1 })
-        screen.addEventListener("mousemove", () => { cursorleft = 0 })
+
+        ctrl.addEventListener("mousemove", () => { cursorleft = 0 });
+        screen.addEventListener("mouseenter", () => { cursorleft = 0 });
+        screen.addEventListener("mouseleave", () => { cursorleft = 1 });
+        screen.addEventListener("mousemove", () => { cursorleft = 0 });
         document.addEventListener('click', () => play(), { once: true });
         copy.addEventListener('click', () => {
-            if (!video.ended) navigator.clipboard.writeText(screen.value)
+            if (!video.ended) navigator.clipboard.writeText(screen.value);
         });
+
         let player = document.getElementById('player');
         player.addEventListener('click', () => {
             if (video.paused) {
@@ -146,6 +161,7 @@
                 player.innerText = "Play";
             }
         }, false);
+
         video.addEventListener('loadedmetadata', () => {
             videoWidth = Math.floor(video.videoWidth / 5);
             videoHeight = Math.floor((video.videoHeight / 5) - 3);
@@ -223,7 +239,6 @@
             const asciiArt = convertToASCII(frameData);
             screen.value = asciiArt;
         }
-
 
         function replaceSpacesWithJSDoc(spaces) {
             if (spaces.length <= 4) return spaces;
