@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bad Apple!! JS</title>
+    <title>JS That Video!</title>
     <style>
         body {
             background: rgb(73, 73, 73);
@@ -35,7 +34,6 @@
             margin: 5px;
             user-select: none;
             cursor: text;
-            user-select: none;
             -webkit-box-shadow: 0px 0px 140px 79px rgba(255, 255, 255, 0.3);
             -moz-box-shadow: 0px 0px 140px 79px rgba(255, 255, 255, 0.3);
             box-shadow: 0px 0px 140px 79px rgba(255, 255, 255, 0.3);
@@ -82,7 +80,6 @@
         }
     </style>
 </head>
-
 <body>
     <a href="https://wojtekgame.is-a.dev"><img src="img.png" /></a>
     <video id="video" type="video/mp4" style="display:none"></video>
@@ -109,6 +106,10 @@
         screen.value = "\n\n\nMade by Gen1x, 2024\n\nThis project was created for fun :D\n\nThe JS code from the frames works on an HTML page. (tested)\n\nNote: There may be some flashing code, so apologies to those with photosensitive epilepsy.";
         screen.style = "height: 525px; width: 691px;";
 
+        let videoWidth, videoHeight;
+        let usedNames = [];
+        let cursorleft = 0;
+
         videoUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -118,12 +119,21 @@
             }
         });
 
-        let mediaRecorder;
-        let recordedChunks = [];
-        let videoWidth, videoHeight;
-        let usedNames = [];
-        let nl = 0;
-        let cursorleft = 0;
+        function updateDimensions() {
+            // Calculate dimensions based on video aspect ratio
+            const maxWidth = Math.min(window.innerWidth * 0.8, video.videoWidth);
+            const scale = maxWidth / video.videoWidth;
+            videoWidth = Math.floor(maxWidth / 5);
+            videoHeight = Math.floor((video.videoHeight * scale) / 5);
+
+            // Update canvas dimensions
+            canvas.width = videoWidth;
+            canvas.height = videoHeight;
+
+            // Update textarea dimensions
+            screen.style.width = `${videoWidth * 10}px`;
+            screen.style.height = `${videoHeight * 10}px`;
+        }
 
         function play() {
             video.play();
@@ -160,16 +170,11 @@
                 video.pause();
                 player.innerText = "Play";
             }
-        }, false);
-
-        video.addEventListener('loadedmetadata', () => {
-            videoWidth = Math.floor(video.videoWidth / 5);
-            videoHeight = Math.floor((video.videoHeight / 5) - 3);
-            screen.style.width = videoWidth;
-            screen.style.height = videoHeight * 2;
-            canvas.width = videoWidth;
-            canvas.height = videoHeight;
         });
+
+        video.addEventListener('loadedmetadata', updateDimensions);
+        window.addEventListener('resize', updateDimensions);
+
         let asciiArt = '';
         let jsSnippets = [
             'function [r](){return Math.floor(Math.random()*[i])+Math.floor(Math.random()*[i])};alert([a]())_',
@@ -232,12 +237,16 @@
         ];
 
         function processFrame() {
-            if (Math.random() > 0) jsSnippets = jsSnippets.sort((a, b) => b.length - a.length);
-            else jsSnippets = jsSnippets.sort((a, b) => a.length - b.length);
-            ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
-            const frameData = ctx.getImageData(0, 0, videoWidth, videoHeight);
-            const asciiArt = convertToASCII(frameData);
-            screen.value = asciiArt;
+            if (!videoWidth || !videoHeight) return;
+            
+            try {
+                ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+                const frameData = ctx.getImageData(0, 0, videoWidth, videoHeight);
+                const asciiArt = convertToASCII(frameData);
+                screen.value = asciiArt;
+            } catch (error) {
+                console.error('Error processing frame:', error);
+            }
         }
 
         function replaceSpacesWithJSDoc(spaces) {
@@ -251,11 +260,8 @@
             for (let i = 0; i < 3; i++)
                 name += chars[Math.floor(Math.random() * chars.length)];
 
-            //name = chars[Math.floor(Math.random() * chars.length)];
-            //name += chars[Math.floor(Math.random() * chars.length)];
-            //if (asciiArt.includes(name)) asciiArt.replaceAll(name, n);
             usedNames.push(name)
-            if (usedNames.includes(name)) asciiArt.replaceAll(name, n); //prevents from making duplicated
+            if (usedNames.includes(name)) asciiArt.replaceAll(name, n);
             return name;
         }
 
@@ -267,6 +273,7 @@
             }
         }
         add();
+
         function convertToJS(asciiLine) {
             let st = asciiLine;
             function fE(hS) {
@@ -311,9 +318,8 @@
                 asciiArt += convertToJS(asciiLine) + '\n';
                 asciiLine = '';
             }
-            return asciiArt
+            return asciiArt;
         }
     </script>
 </body>
-
 </html>
