@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bad Apple!! in working JavaScript</title>
+    <title>Bad Apple!! JS</title>
     <style>
         body {
-            background-color: rgb(60, 60, 60);
+            background: rgb(73, 73, 73);
             color: white;
             font-family: monospace;
             display: flex;
@@ -19,7 +19,7 @@
         }
 
         textarea {
-            background-color: black;
+            background: black;
             color: white;
             font-size: 100%;
             text-align: center;
@@ -32,8 +32,13 @@
             overflow-x: hidden;
             border-radius: 10px;
             padding: 5px;
+            margin: 5px;
             user-select: none;
-            margin-top: 10px;
+            cursor: text;
+            user-select: none;
+            -webkit-box-shadow: 0px 0px 140px 79px rgba(255, 255, 255, 0.3);
+            -moz-box-shadow: 0px 0px 140px 79px rgba(255, 255, 255, 0.3);
+            box-shadow: 0px 0px 140px 79px rgba(255, 255, 255, 0.3);
         }
 
         #render {
@@ -41,67 +46,71 @@
         }
 
         #ctrl {
-            margin-top: -25px;
+            position: absolute;
+            display: flex;
+            vertical-align: middle;
+            align-items: center;
+            display: none;
+            background-color: #000;
+            padding: 5px;
+            text-align: center;
+            padding-top:10px;
+        }
+
+        button {
+            font-family: monospace;
+            background: #000;
+            color: #fff;
+            border-style: solid;
+            border-color: #fff;
+            cursor: pointer;
+            padding: 3px;
+            
+        }
+
+        button:hover,::selection {
+            background: rgb(88, 143, 6);
+        }
+        img {
+            user-select: none;
+            border-radius: 10px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5%;
+            margin: 5px;
         }
     </style>
 </head>
 
 <body>
+    <a href="https://wojtekgame.is-a.dev"><img src="img.png" /></a>
     <video id="video" src="bad_apple.mp4" type="video/mp4" style="display:none"></video>
-    <textarea id="screen" readonly></textarea><br /><br />
     <div id="ctrl">
         <button id="copy">Copy JS</button>
         <button id="player">Play</button>
+        <br/>
+        <input type="checkbox" id="jsdoc">
+        JSDoc comments
     </div>
+    <textarea id="screen" readonly></textarea><br /><br />
     <canvas id="render"></canvas>
     <script>
-        const video = document.getElementById('video');
-        const screen = document.getElementById('screen');
-        const copy = document.getElementById('copy');
-        const canvas = document.getElementById('render');
+        let gEBI = (a) => { return document.getElementById(a) }
+        const video = gEBI('video');
+        const screen = gEBI('screen');
+        const copy = gEBI('copy');
+        const canvas = gEBI('render');
+        const ctrl = gEBI('ctrl');
         const ctx = canvas.getContext('2d');
-        screen.style="height: 525px; width: 691px;";
-        screen.value=`Made by WojtekGame, 2024
-                                     =@#(=[%(                                      
-                                    @>      ~@                                     
-                                    #@@-     *@                                    
-                                     :@@@    *@                                    
-                              *@@@@[     @   @<%@^                                 
-                        ^@@%#{           {% @~   *%@%.                             
-                    .%@%                              @@@{                         
-                  :@]                                     *@@#:                    
-                 %}                                           (@#                  
-                }[                                               {)                
-               [#                                                 )#               
-               @      +@[        =         \\  /\\  /                    %:              
-              ~{     <{ *@.     }@=         \\/\  \\/                      @              
-              =[     @   [*     @@@.(#   }     %     =              *#             
-              =[     @    %:   @@}-@@%}(@{  +#%@@:   %*              #             
-              =[     @     [} <@@         <@%@@%@    ]@-             }~            
-              }(     @    __ @@@>               @     #@*             @            
-             <#      @  @[=]%^):         -@#-   @     .@@             @            
-             ))      @ +[    #)        {}   ~@  %~     %@@:           %:           
-             ))      @        (       @=      @  @      @@@ (@  {)    )]           
-              @      @                [:      *  @.     +@@[ {+  @    .{           
-              @      @        @((((]@^           (]     ~@@@  @   @   :{           
-              =[ %]  %@       %     @^           *#      @@@@<%@>(@@. {^           
-               @}  @<+@%:     #%__(@#            ~#      @*-{{                     
-                    ^#   %@#+                  [%@%      [^                        
-                             +@%{]]]]]]#%%%%@@@+  ^{ %@[ [^                        
-                             <@=  =@@@@}    +@@=   @%  =@@^                        
-                            <%       []     #@@@<=       }^                        
-                            @       <@@{)   @@@@@@@@@@#^-                          
-                           }~    ^%       >@@@@@@@@@@@@@@@@@@}^                    
-                           {~   })                 =+]@@@@@@%  :(@-                
-                           @    @~                     ^          (@               
-                           @    {>                   {}            <#              
-                           @     @)                  @              @              `
+        screen.value = "\n\n\nMade by WojtekGame, 2024\n\nI made this project for fun :D\n\nalso, the JS code from the frames DOES work on an HTML page. (tested)\n\nyou will see a bit of flashing code so,\n\ni'm sorry for those who have photosensitive epilepsy";
+        screen.style = "height: 525px; width: 691px;";
         let mediaRecorder;
         let recordedChunks = [];
         let videoWidth, videoHeight;
-        let usedNames = []
-        let name = "Bad Apple!!";
+        let usedNames = [];
         let nl = 0;
+        let cursorleft = 0
         function play() {
             video.play();
             player.innerText = "Pause";
@@ -113,15 +122,17 @@
                     screen.style.width = "1px";
                     screen.style.width = (screen.scrollWidth) + "px";
                 }
-                else if (video.ended) {
-                    screen.value = "\"Bad Apple!!\""
-                }
+                else if (video.ended) screen.value = ""
+                ctrl.style.display = (cursorleft == 0) ? "block" : "none"
                 window.requestAnimationFrame(exec);
             }
             requestAnimationFrame(exec);
         }
+        ctrl.addEventListener("mousemove", () => { cursorleft = 0 })
+        screen.addEventListener("mouseenter", () => { cursorleft = 0 })
+        screen.addEventListener("mouseleave", () => { cursorleft = 1 })
+        screen.addEventListener("mousemove", () => { cursorleft = 0 })
         document.addEventListener('click', () => play(), { once: true });
-
         copy.addEventListener('click', () => {
             if (!video.ended) navigator.clipboard.writeText(screen.value)
         });
@@ -145,16 +156,52 @@
         });
         let asciiArt = '';
         let jsSnippets = [
+            'function [r](){return Math.floor(Math.random()*[i])+Math.floor(Math.random()*[i])};alert([a]())_',
+            'function [r](){return Math.floor(Math.random()*[i])+Math.floor(Math.random()*[i])};console.log([a]())_',
+            'const [r]=()=>{return Math.floor(Math.random()*[i])+Math.floor(Math.random()*[i])};alert([a]())_',
+            'const [r]=()=>{return Math.floor(Math.random()*[i])+Math.floor(Math.random()*[i])};console.log([a]())_',
+            'let [r]=()=>{return Math.floor(Math.random()*[i])+Math.floor(Math.random()*[i])};alert([a]())_',
+            'let [r]=()=>{return Math.floor(Math.random()*[i])+Math.floor(Math.random()*[i])};console.log([a]())_',
+            'function [r](){return Math.floor(Math.random()*[i])};alert([a]())_',
+            'function [r](){return Math.floor(Math.random()*[i])};console.log([a]())_',
+            'const [r]=()=>{return Math.floor(Math.random()*[i])};alert([a]())_',
+            'const [r]=()=>{return Math.floor(Math.random()*[i])};console.log([a]())_',
+            'let [r]=()=>{return Math.floor(Math.random()*[i])};alert([a]())_',
+            'let [r]=()=>{return Math.floor(Math.random()*[i])};console.log([a]())_',
+            'function [r](){return Math.random()};alert([a]())_',
+            'function [r](){return Math.random()};console.log([a]())_',
+            'const [r]=()=>{return Math.random()};alert([a]())_',
+            'const [r]=()=>{return Math.random()};console.log([a]())_',
+            'let [r]=()=>{return Math.random()};alert([a]())_',
+            'let [r]=()=>{return Math.random()};console.log([a]())_',
+            'function [r](){return"[a]"};console.log([a]())_',
+            'function [r](){return"[a]"};alert([a]())_',
+            'const [r]=()=>{return"[a]"};alert([a]())_',
             'const [r]=()=>{return"[a]"};console.log([a]())_',
             'let [r]=()=>{return"[a]"};console.log([a]())_',
             'const [r]=()=>{return"[a]"}_',
             'const [r]=()=>{return}_',
+            'const [r]=["[r]","[a]","[r]","[a]"]_',
+            'const [r]=["[r]","[a]","[r]"]_',
+            'const [r]=["[r]","[r]"]_',
+            'const [r]=["[r]","[a]","[r]","[a]"]_',
+            'const [r]=["[r]","[a]","[r]"]_',
+            'const [r]=["[r]","[r]"]_',
+            'const [r]=["[a]"]_',
             'const [r]={}_',
+            'const [r]=[]_',
             'const [r]=""_',
+            'const [r]=[i]_',
             'let [r]=()=>{return"[a]"}_',
             'let [r]=()=>{return}_',
+            'let [r]=["[r]","[a]","[r]","[a]"]_',
+            'let [r]=["[r]","[a]","[r]"]_',
+            'let [r]=["[r]","[r]"]_',
+            'let [r]=["[a]"]_',
+            'let [r]=[]_',
             'let [r]={}_',
             'let [r]=""_',
+            'let [r]=[i]_',
             'console.log("[r]")_',
             'alert("[r]")_',
             'navigator.clipboard_',
@@ -163,7 +210,9 @@
             'document.body_',
             'navigator_',
             'document_',
-            'console_'
+            'console_',
+            '[i][i]_',
+            '[i]_',
         ];
 
         function processFrame() {
@@ -182,7 +231,7 @@
         }
 
         function n() {
-            const chars = "qwertyuiopasfgghjklzxcvbnmQWERTYUIOPASFGHJKLZXCVBNM_";
+            const chars = "qwertyuiopasfgghjklzxcvbnmQWERTYUIOPASFGHJKLZXCVBNM";
             let name = '';
             for (let i = 0; i < 3; i++)
                 name += chars[Math.floor(Math.random() * chars.length)];
@@ -191,45 +240,41 @@
             //name += chars[Math.floor(Math.random() * chars.length)];
             //if (asciiArt.includes(name)) asciiArt.replaceAll(name, n);
             usedNames.push(name)
-            if (usedNames.includes(name)) asciiArt.replaceAll(name, n);
+            if (usedNames.includes(name)) asciiArt.replaceAll(name, n); //prevents from making duplicated
             return name;
         }
 
         function add() {
-            const l = ["canvas", "video", "body", "h1", "h2", "textarea", "h3", "p", "svg", "i", "b"];
+            const l = ["canvas", "video", "h1", "h2", "textarea", "h3", "p", "svg", "i", "b", "div", "button"];
             for (let i = 0; i < l.length; i++) {
                 jsSnippets.push('const [r]=document.createElement("' + l[i] + '")_');
                 jsSnippets.push('let [r]=document.createElement("' + l[i] + '")_');
-
             }
         }
         add();
         function convertToJS(asciiLine) {
             let st = asciiLine;
-            jsSnippets.forEach(snippet => {
-                const snippetLength = snippet.length;
-                const hashSequence = '#'.repeat(snippetLength);
-                const regex = new RegExp(hashSequence, 'g');
-                st = st.replace(regex, snippet);
-                st = st.replace(/\[r\]/g, n);
-                st = st.replace(/\[a\]/g, usedNames[usedNames.length - 1]);
-                st = st.replace(/\[r\]/g + "()", usedNames[1 - usedNames.length] + "()");
-            });
+            function fE(hS) {
+                jsSnippets.forEach(snippet => {
+                    const snippetLength = snippet.length;
+                    const hashSequence = hS.repeat(snippetLength);
+                    const regex = new RegExp(hashSequence, 'g');
+                    st = st.replace(regex, snippet);
+                    if (Math.floor(Math.random() * 2)==1)st.replaceAll("[r]", "[r][r]")
+                    st = st.replace(/\[r\]/g, n);
+                    st = st.replace(/\[a\]/g, usedNames[usedNames.length - 1]);
+                    st = st.replace(/\[r\]/g + "()", usedNames[1 - usedNames.length] + "()");
+                    st = st.replace(/\[i\]/g, 100 + Math.floor(Math.random() * 800));
+                });
+            }
 
+            fE('#')
             st = st.replace(/#/g, ';');
-            jsSnippets.forEach(snippet => {
-                const snippetLength = snippet.length;
-                const hashSequence = ';'.repeat(snippetLength);
-                const regex = new RegExp(hashSequence, 'g');
-                st = st.replace(regex, snippet);
-                st = st.replace(/\[r\]/g, n);
-                st = st.replace(/\[a\]/g, usedNames[usedNames.length - 1]);
-                st = st.replace(/\[r\]/g + "()", usedNames[1 - usedNames.length] + "()");
-            });
+            fE(';')
             st = st.replaceAll("_", ";");
             st = st.replace("; ", ";");
             st = st.replace("*/ ", "*/");
-            st = st.replace(/\s+/g, replaceSpacesWithJSDoc);
+            if (document.getElementById("jsdoc").checked)st = st.replace(/\s+/g, replaceSpacesWithJSDoc);
             usedNames = [];
             return st;
         }
@@ -251,7 +296,7 @@
                 asciiArt += convertToJS(asciiLine) + '\n';
                 asciiLine = '';
             }
-            return asciiArt;
+            return asciiArt
         }
     </script>
 </body>
